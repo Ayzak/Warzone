@@ -1,0 +1,54 @@
+/* @Authors : Jeremy Locheron, Damien Cauquil. */
+
+#warzone {
+	
+   overflow: hidden;
+
+}
+
+/**
+ *  The background take all the place.
+ */
+body
+{
+
+	/* Light background. */
+	background: url('pictures/dashboard-bg.jpg') no-repeat;
+
+	/* Dark background. */
+	/*background: url('pictures/NDH2K14_network.jpg') no-repeat; */
+
+	background-color: "white";
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+
+	overflow: hidden;
+}
+
+/**
+ *  Download font for the rank.
+ */
+
+ /* TEST */
+ /*@font-face
+{
+	font-family:knight;
+	src: url("stocky.ttf");
+
+}*/
+
+@font-face
+{
+	font-family:computerfont;
+	src: url("Computerfont.ttf");
+
+}
+
+@font-face
+{
+	font-family: foo;
+	src: url("SPACP___.TTF");
+
+}

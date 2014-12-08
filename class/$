@@ -1,0 +1,209 @@
+/** 
+	Fire who represent the network flux.
+	*Sens of the angle for the animation to declare and create appropriate conditions.
+*/
+
+/* Construct.*/
+function Strike (x1, y1, x2, y2, speed) {
+
+    /**************************************************************************
+     * Initial position and rotation.
+     *************************************************************************/
+
+    /* Save origin and target coordinates. */
+	this.x = Math.min(x1, x2);
+	this.y = Math.min(y1, y2);
+    this.x1 = x1 - this.x;
+	this.y1 = y1 - this.y;
+	this.x2 = x2 - this.x;
+	this.y2 = y2 - this.y;
+
+    /* Compute height and width. */
+    this.height = Math.abs(y2-y1);
+    this.width = Math.abs(x2-x1);
+
+
+
+    /**************************************************************************
+     * Canvas creation.
+     *************************************************************************/
+
+	/* Retrieve our image. */
+	this.img = (new Loader()).getImage("template/pictures/strikers2.png");
+
+	/* Pythagore and calcul of segment with point (x,y) on an orthonormal landmark. */
+	this.traffic = document.createElement('canvas');
+	this.traffic.id = 'traffic';
+	this.traffic.width = Math.sqrt( Math.pow(this.width , 2) + Math.pow(this.height, 2))*2;
+	this.traffic.height = this.img.height;
+	this.traffic_ctx = this.traffic.getContext('2d');
+
+    /* Compute basic rotation. */
+    this.rotation = Math.asin(( this.height ) / (this.traffic.width/2));
+
+	/*Canvas on memory.*/
+	this.canvas = document.createElement('canvas');
+	this.context = this.canvas.getContext("2d");
+	this.canvas.id = "incli";
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+
+    /* Compute deltas. */
+    var dw = (this.img.height / 2) * Math.cos(this.rotation - Math.PI/2);
+    var dh = (this.img.height / 2) * Math.sin(this.rotation - Math.PI/2);
+    this.width += 2*dw;
+    this.canvas.width = this.width;
+    this.height += 2*dh;
+    this.canvas.height = this.height;
+    this.x -= dw;
+    this.y -= dh;
+    console.log('rot='+this.rotation);
+    console.log('dw='+dw+' dh='+dh);
+    console.log('x='+this.x +' y='+this.y +' h='+this.height+' w='+this.width);
+
+
+    /***************************************************************************
+     * Adjustments.
+     **************************************************************************/
+
+    if (this.y2 > this.y1) {
+        if (this.x2 < this.x1) {
+            this.rotation += Math.PI/2;
+        } else if (this.x2 == this.x1) {
+            this.rotation = Math.PI/2;
+        }
+    } else if (this.y2 < this.y1) {
+        if (this.x2 < this.x1) {
+            this.rotation -= Math.PI;
+        } else if (this.x2 > this.x1) {
+            this.rotation = -this.rotation;
+        } else if (this.x2 == this.x1) {
+            this.rotation = -Math.PI/2;
+        }
+    }
+
+
+	/* Properties of our animation. */
+	this.offset = 0;
+	this.speed = speed;
+
+}
+
+/*Render.*/
+Strike.prototype.render = function (){
+	/*Clear the drawing zone.*/
+	this.traffic_ctx.clearRect(0,0,this.traffic.width,this.traffic.height);
+
+	this.traffic_ctx.save();
+
+	/* Instructions for the cut picture on the canvas.*/
+	this.traffic_ctx.drawImage(
+		this.img,
+		0,	
+		0,
+		this.img.width,
+		this.img.height,
+		this.offset,
+		0,
+		this.img.width,
+		this.img.height
+	);
+
+	/*Restoration of the original context for restart an other drawing.*/
+	this.traffic_ctx.restore();
+	
+	this.direction();
+
+	return this.canvas;
+	
+}
+
+/* Calcul of the direction.*/
+Strike.prototype.direction = function (){
+
+	/*mathematic formula for the rotate angle in radian.*/
+	var Rotation = Math.asin(( this.canvas.height ) / (this.traffic.width/2));
+
+	/* translate the context point for a visible and centrate drawing.*/ 
+	this.context.save();
+
+	this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
+
+	this.context.translate(this.x1 , this.y1);
+	
+	/*For each conditions.*/
+    /*
+    if (this.up_left){
+		this.context.rotate(Rotation + 3 * Math.PI);
+
+	}else if (this.up_right){
+		this.context.rotate(-Rotation);
+
+	}else if (this.down_left){
+		this.context.rotate(-(Rotation + (3*Math.PI)));
+
+	}else if (this.down_right){
+		this.context.rotate(Rotation);
+
+	}*/
+
+    this.context.rotate(this.rotation);
+
+	/* Particular cases.*/
+	/*The application doesn't want "this.item[i].height".
+	Pythagore calcul une diagonale, seulement y'en a pas si les directions sont droite ....
+	Autrement dis, j'ai l'impression qu'on ne pourra pas gérer les directions droite d'un centre  
+	de coté vers un autre centre de coté, idem de haut en bas par les milieu du canvas...*/
+/*
+	else if (this.middle_up){
+		//this.context.translate(this.x1 + 30 , this.y1)
+		this.context.rotate(-Math.PI/2);	
+		
+	}else if (this.middle_down){
+		this.context.translate(this.x1 + 30 , this.y1)
+		this.context.rotate(Math.PI/2);
+		this.context.fillRect(0,0,this.canvas.width,this.canvas.height);
+	}else if (this.middle_right){
+		this.context.rotate(Math.PI*2);
+
+	}else if (this.middle_left){
+		this.context.translate(this.x2, this.y2+30)
+		this.context.rotate(Math.PI);
+	}
+    */
+
+	/*Render.*/
+	this.context.drawImage(
+		this.traffic,
+		0,
+		0,	
+		this.traffic.width,
+		this.traffic.height,
+		0,
+		0,
+		this.traffic.width/2,
+		this.traffic.height/2
+		);
+
+	this.context.restore();
+
+	return this.canvas;
+
+}
+
+/* Animation.*/
+Strike.prototype.nextFrame = function (){
+	
+	/* Let's move the strikers.*/
+	this.offset += this.speed;
+	if (this.offset >= this.traffic.width) {
+		this.offset = 0;
+	}
+}
+
+/* Modification of the value for the direction or speed.*/
+Strike.prototype.setSpeed = function (new_speed) {
+	this.speed = new_speed;	
+}
+
+

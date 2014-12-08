@@ -1,0 +1,225 @@
+# Monitoring du CTF de la Nuit Du Hack 2K14. #
+# @ Authors : Jeremy Locheron, Damien Cauquil.
+*
+*	Le but recherché.
+*	Les idées de bases du design.
+*	Les différentes parties composants l'application.
+*	Le fonctionnement de chacune de ces parties.
+*	Les liens entre les différents fichiers.
+*	Prise en main.
+
+---
+
+## Le but recherché. ##
+
+> Durant plusieurs années les participants à la nuit du hack confirmé ou non, étaient frustrés
+> de ne pas pouvoir voir ce qu'il se passait entre chaque équipe pendant le Capture The Flag.
+> C'est pourquoi nous avons développé un système de monitoring se voulant intuitif et attractif
+> pour les néophyte mais aussi pour les gens plus habitué à ce milieu. 
+
+## Les idées de bases du design. ##
+
+> Le design se veut à la fois intuitif et attractif avec une volonté de représentation assez
+> "retrogaming".
+> Nous avons voulu représenter cet évènement d'une manière assez vidéoludique. Ce qui était le
+> adapté à notre sens était un jeu de "guerre" c'est pourquoi nous avons décidé de représenter
+> le traffic par des "missiles" que s'enverrait différentes équipes. 
+> La meilleurs façon de représenter 10 équipes sur un espace assez réduit qu'est un écran de
+> naviguateur est pour nous de les placer en cercles.
+> Partant de là, à nous d'adapter l'espace de la page internet avec nos différents impératifs de
+> représentations.
+
+---
+
+## Les différentes parties composants l'applications. ##
+
+### Nos impératifs de représentation. ###
+
+*	> Il nous a fallu trouver un moyen de représenter les équipes mais aussi un monitoring pour
+	> représenter la perte de flags mais aussi pour représenter les variations des services de
+	> chaque équipe. Nous avons opté pour une repprésentation circulaire et une autre sous
+	> forme d'une barre de vie horizontale ou verticale.
+	> Pour ce qui est de la représentation des équipes nous avons opté pour des couleurs
+	> différentes caractérisant chaque équipe ainsi que la couleur de leurs munitions.
+	> Chaque équipe dispose aussi d'un fanion (leur logo) disposé à coté du marqueur les
+	> représentant sur la zone de "guerre" (La warzone).
+	> Pour des raison de places et de sur encombrement nous avons choisi de disposé les
+	> monitoring de flags et de services à des endroits séparés.
+	>
+*	> L'application doit aussi représenter les variations lié aux points de chaque équipe. Nous
+	> avons donc développé un classement animé en fonction du gain ou de la perte de points.
+	> Le classement est composé de dix vignettes, chacune représentant une équipe avec :
+	> - sa place dans le classement
+	> - son nom
+	> - son nombre de points
+	> - sa nationalité
+	> - son fanion
+	> L'animation est différentes en fonction de la monté ou de la descente dans le classement.
+	> Les équipes descendant dans le classement se verront passé à l'arrière plan lors de
+	> l'animation alors que les équipes grimpants dans le classement se verronts passé au premier
+	> plan lors de l'animation.
+	>
+*	> L'application doit aussi représenter le temps restant avant la fin de l'épreuve c'est
+	> pourquoi on trouve au bas de celle-ci une barre de progression indiquant de façon textuell
+	> le temps restant mais aussi une animation de bar de progression durant 12h et augmentant au
+	> fur et à mesure que le temps passe.
+	>
+*	> L'animation devra aussi comporté une légende indiquant à quoi corresponde chaque élément
+	> de l'application. Elle sera placé dans les espace vide de cette dernière.
+
+---
+
+## Le fonctionnement de chaque parties. ##
+
+> La barre de progression :
+>	- Il s'agit d'un décompte indépendant du reste de l'application qui décompte le temps en jours
+>	/heures/minutes/secondes avant la fin de du CTF.
+>	Elle comporte une animation de remplissage au cours du temps avec un coefficient modulaire
+>	afin de tenir le temps que l'on veut. Le coefficient pour tenir 12h est en commentaire dans
+>	le fichier [class/TimerBar.js].
+> Le classement :
+>	- Il s'agit d'un classement classique avec des vignettes correspondant aux équipes et placé
+>	les unes au dessus des autres. Chaque équipe voit représenter son nom, sa place dans le
+>	classement, son pays, son fanion et son nombre de points. Suivant la variation du nombre de
+>	points une animation approprié avec un replacement dans le classement est effectué. (cf:
+>	partie précédente correspondant au classement pour plus de détails sur l'animation).
+> La warzone :
+	- Cette partie est la plus conséquente. Elle doit représenter et contenir l'ensemble du
+>	traffic entre les 10 équipes, ce qui comprend aussi la représentation de chaque équipe.
+>	Pour ce faire nous avons décidé après quelques teste d'alléger la représentation des équipes
+>	et de ne laisser sur la warzone que le fanion de l'équipe et un marqueur (point) de couleur
+>	pour les différencier. Par la suite nous avons intégré un camembert de couleur à la place de
+>	ce marqueur ce qui permet de représenter la couleur de l'équipe, de créer un point de départ
+>	pour les projectiles mais aussi de marquer en temps réel les variations des services de
+>	chaques équipes. La variation d'opère par une baisse de l'intensité de la couleur après
+>	l'animation par un système de transformation de la couleur:
+>		-La couleur est marqué à la base en hexadécimal seulement on ne peut varier facilementla
+>		couleur c'est pourquoi nous avons convertie l'hexa en RGB pour le RGB en HSL qui nous
+>		permet de jouer sur l'intensité dfe la couleur (L = lightness) et en la baissant nous
+>		avons un contrast assez important pour être visible à l'écran. Biensur il faut repasser
+>		de HSL à hexadecimal pour que ce soit effectif.
+>	Les équipes sont placé en forme de cercle avec un écartement de PI/5 pour faire contenir les
+>	10 équipes sur un cercle complet.
+>
+>	- Pour la représentation du traffic il y a plusieurs paramètres. Le traffic part d'une
+>	équipe et va à une autre avec une certaine vitesse pour représenter l'intensité du traffic.
+>	Il faut donc calculer la diagonale pour avoir la taille du parcours et ensuite renseigner
+>	l'équipe de départ et d'arriver ainsi que la vitesse à la création des projectiles.
+>	Lorsqu'un Flag est capturé une animation spécifique est appelé (un grappin) fonctionnant
+>	sur le même principe.
+
+---
+
+## Les liens entre les différents fichiers. ##
+	
+    Warzone/
+
+		Class/
+
+			/* Classement */
+			rankTeam.js -> crée une vignette d'équipe
+			Rank.js -> Crée l'ensemble du classement avec les 10 vignettes et gère l'animation
+
+			/* Progression */
+			TimerZone.js -> Gère l'affichage textuel et du décompte numérique avant la fin du CTF
+			TimerBar.js -> Gère l'animation de la barre de progression et affiche le décompte
+
+			/* warzone */
+			Flags.js -> représentation camembert
+			Life.js -> représentation d'une barre de vie
+			Team.js -> représentation d'une team dans la warzone
+			Strike.js -> gère l'animation des missiles
+			Marqueur.js -> gère l'affichage des points de couleurs représentant une team
+			Capture.js -> gère l'animation du grappin lors d'une capture de flag
+
+		Conrtol/
+
+			/* rendu global */
+			GlobalRender.js -> gère le rendu global de chaque élément sur le canvas principal
+			Loader.js -> Gère le chargement de chaque élément image à intégrer
+			Warzone.js -> gère le placement et le rendu en cercle de toutes les teams
+			
+			/* variables constantes */
+			Settings.js -> Contient toutes les variables constantes global
+
+            /* facilite le chargement et l'utilisation d'éléments externes */
+            Loader.js -> Permet de charger un ou plusieurs éléments et l'afficher quand il est chargé dans l'animation afin de ne pas retarder le chargement global.
+            /* gère l'affichage de tous les éléments correspondant à la "warzone" et donc à l'affichage du monitoring */
+            Warzone.js -> place tous les éléments nécéssaire au monitoring (teams, projectile, grappin, fanions, jauge de services actifs etc ...
+
+            /* récupère les données de variations en json et les traitent */
+            Poller.js -> Récupère les données poussé par le serveur grâce à ajax et traite le json.
+
+            /* gère l'interface et charge tous les éléments nécéssaires */
+            UI.js -> appel les nouvelles instances de tous les éléments nécéssaires au bon fonctionnement de l'application.
+
+		Template
+
+			/* éléments graphiques de l'application */
+			drapeau_pays/ -> contient les drapeaux des différents pays
+			fanions/ -> contient les fanion à taille icone et bannière pour classement et warzone
+			pictures/ -> Contient les missiles
+			style.css
+
+
+	warzone.html -> Appel les class et controleurs en créant le canvas principal
+
+---
+
+## Prise en main. ##
+(A l'aide de la console du naviguateur).
+
+## Un peu de documentation: ##
+
+### Classement ###
+
+*	ui.rank_ : nouvelle instance de rank global et permet d'intéragir avec le classement.
+*	ui.rank.update_: permet de mettre à jour le classement et prend en paramètre un tableau
+*	ex:
+
+	```
+	ui.rank.update([0,1,2,3,4,5,6,7,8,9]);
+ 	```
+
+* ui.rank.teams[0].Pts;_ : Affiche le nombre de points de l'équipe.
+```
+	ui.rank.teams[0].Pts;
+```
+
+```
+	ui.rank.updateScore(team,newScore);
+	/* Modifie le scode d'une équipe précise. */
+```
+
+### Warzone ###
+
+*	ui.war : zone permettant d'intéragir avec la warzone.
+*	ui.war.addStrike, ui.war.updateStrike, ui.war.removeStrike : méthodes permettant d'ajouter des missiles représentant le traffic et le update modifie la variable vitesse du déplacement.prend en paramètres une team et départ, une team d'arriver et une vitesse. 0< team <9 et vitesse<=1.
+
+*	ui.war.addCapture_ : Permet d'ajouter un grappin représentant la capture d'un drapeau entre 2 équipes.
+	Prend en paramètre une team de départ et une team d'arrivé (nombre en 0 et 9).
+
+*	ex:
+ 	```
+ 		ui.war.thisIsWar() /* Simule du traffic de façon assez... bourrin. */
+ 	```
+
+### Marqueur/monitoring des services dans la warzone ###
+
+*	Syntaxe pour modifier la valeur des monitorings de services:
+	```
+		/*
+		J est le numéro de l'équipe compris entre 0 et 9 et n est la variation que lion veut appliquer au camembert, compris entre 0 et 1.
+		*/
+		ui.war.updateServices(j,n);
+	```
+
+### Les barres de vies qui servent de monitoring pour les flags volés ###
+
+*	ui.life : Nouvelle instance des barres de vie.
+*	ui.life.updateLife : prend en paramètre une équipe et la variation à effectuer compris entre 0 et 1.
+	ex:
+	```
+		/* La team 5 à 80% de ses drapeaux qui on été volés au moins une fois. */
+		ui.life.updateLife(5,0.8);
+	```

@@ -1,0 +1,62 @@
+/**
+ * Controler who going to place 10 teams on the warzone and make the gestion of actions.  
+ */
+var Warzone = function() {
+
+    /* Call the singleton to draw new elements ont the main canvas. */
+    this.render = new GlobalRender('warzone');
+
+    /* List of different teams. */
+    this.teams = {};
+
+    this.Placement();
+}
+
+/**
+ * Place teams on the canvas.
+ */
+Warzone.prototype.Placement = function(){
+
+    /* The center of the "scene" and of the circle to draw teams. */
+    var centerX = this.render.canvas.width/2;
+    var centerY = this.render.canvas.height/2;
+    var radius = (this.render.canvas.height/2)-100;
+
+    /* Boucle for drawing teams on circle positon on the warzone. */
+    var id = 0;
+    for (var angle = null; angle < (Math.PI*2) ; angle += (Math.PI/5)){
+
+        /* Compute positions on x and y. */
+        var x = centerX + Math.cos(angle) * radius - 100/2; /* Team height: 100px */
+        var y = centerY + Math.sin(angle) * radius  - 100/2; /* Team width: 100px */
+
+        /* Creation of the team. */
+        this.teams[id] = new Team(x, y, 0, 0, null, null);
+        this.render.add(this.teams[id++]);
+    }
+}
+
+Warzone.prototype.thisIsWar = function() {
+    /* Test missiles. */
+    var random_team = function(){ return Math.floor((Math.random()*10)); };
+    var random_speed = function(){ return Math.floor((Math.random()*15) + 10); };
+
+    for (var strikes = 0; strikes < 20; strikes++) {
+        var origin = random_team();
+        var dest = random_team();
+        console.log(origin+' -> '+dest);
+        while (origin == dest)
+            dest = random_team();
+        var x1 = this.teams[origin].x + 50;
+        var y1 = this.teams[origin].y + 50;
+        var x2 = this.teams[dest].x + 50;
+        var y2 = this.teams[dest].y + 50;
+        var m = new Strike(x1, y1, x2, y2, random_speed());
+        this.render.add(m);
+        this.render.moveToBack(m);
+    }
+
+}
+
+
+

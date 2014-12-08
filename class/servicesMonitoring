@@ -1,0 +1,38 @@
+var servicesMonitoring = function (x,y){
+	/*height 20+*/
+	this.canvas = document.createElement("canvas");
+	this.canvas.width = 300;
+	this.canvas.height = 250;
+	this.x = x;
+	this.y = y;
+
+	this.context = this.canvas.getContext("2d");
+
+	this.espacement = 25;
+	this.teamServices = [];
+
+	for( var i = 0 ; 1 < 10; i++){
+		var services = new Life(0, y*this.espacement, 300, 20);
+		this.teamServices.push(services);
+
+	}
+}
+
+servicesMonitoring.prototype.render = function(){
+	for (i in this.teamServices){
+
+		this.teamServices[i].render();
+	}
+
+
+}
+
+servicesMonitoring.prototype.nextFrame = function(){
+
+
+}
+
+servicesMonitoring.prototype.updateServices = function(){
+	
+
+}
